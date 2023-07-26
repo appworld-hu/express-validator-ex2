@@ -13,6 +13,10 @@
           <li><%= err.msg %></li>
         <% }); %>
       </ul>
+  <% } 
+  
+  if( success.length > 0 ) { %>
+    <li><%= success %></li>
   <% } %>
 
     <h2>Regisztráció</h2>
@@ -23,9 +27,9 @@
         <br><br>
         <input type="text" name="email" placeholder="E-mail">
         <br><br>
-        <input type="password" name="password" placeholder="jelszó">
+        <input type="password" name="password" placeholder="jelszó" value="aaAA1122#">
         <br><br>
-        <input type="password" name="password_confirmation" placeholder="Jelszó ismét">
+        <input type="password" name="password_confirmation" placeholder="Jelszó ismét" value="aaAA1122#">
         <br><br>
         <button>Regisztrálok</button>
 

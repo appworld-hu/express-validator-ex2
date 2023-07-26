@@ -2,8 +2,18 @@ const express = require('express');
 const {body, validationResult, matchedData} = require('express-validator');
 const session = require('express-session')
 const flash = require('express-flash')
-let ejs = require('ejs'); 
+const ejs = require('ejs'); 
+const {MongoClient, ServerApiVersion} = require('mongodb')
+const client = new MongoClient("mongodb://localhost:27017/", {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
 
+})
+
+ 
 
 const app = express();
 app.use(express.urlencoded({extended: true}))
@@ -34,21 +44,26 @@ app.post('/',
                     else 
                     return true;
                 }),
-        (req, res, next)=>{
+        async (req, res, next)=>{
+            await client.connect();
             const validation = validationResult(req)
             console.log(validation);
             if( !validation.isEmpty() ) {
                 req.flash('errors', validation.errors)
                 res.redirect('/')
             } else {
-                res.send(matchedData(req))
+                const connection = client.db("register_example")
+                const usersDoc = connection.collection('users')
+                await usersDoc.insertOne( matchedData(req) )
+                req.flash('success', 'Sikeres regisztráció!');
+                res.redirect('/')
             }
         }
 )
 
 
 app.get('/', (req, res)=>{
-    ejs.renderFile(__dirname+'/public/page.ejs', {errors: req.flash('errors')}, (err, result)=>{
+    ejs.renderFile(__dirname+'/public/page.ejs', {errors: req.flash('errors'), success: req.flash('success')}, (err, result)=>{
         res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'});
         res.end(result)
     })
